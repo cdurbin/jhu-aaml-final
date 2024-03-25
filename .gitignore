@@ -1,3 +1,5 @@
 aaml-final/
 references/qtable_debug.txt
 .ipynb_checkpoints/
+__pycache__/
+output/

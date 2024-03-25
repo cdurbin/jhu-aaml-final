@@ -1,0 +1,91 @@
+import numpy as np
+
+def check_for_duplicates(trajectory, state, action):
+    """Checks to see if there is another row in the provided trajectory for the
+    same state and action. For the first visit Monte Carlo algorithm we only want
+    to process the first visit."""
+    for row in trajectory:
+        if row['s'] == state and row['a'] == action:
+            return True
+    return False
+
+class RlAgent:
+    def __init__(self):
+        self.num_states = 203 # Note that only 202 are actually reachable
+        self.num_actions = 2
+        self.state = None
+        self.action = None
+        self.epsilon = 0.15
+        self.discount_factor = 1.0
+        self.current_trajectory = []
+        self.q = np.zeros((self.num_states + 1, self.num_actions), dtype="float32")
+        self.sa_visits = np.zeros((self.num_states + 1, self.num_actions), dtype="int")
+
+    # Public API
+    def get_number_of_states(self):
+        return self.num_states
+
+    def get_number_of_actions(self):
+        return self.num_actions
+
+    def select_action(self, state):
+        if self.state is None:
+            self.current_trajectory = [{'s': state}]
+        self.state = state
+        q_values = self.q[state, ]
+        action = self.e_greedy(q_values)
+        self.action = action
+        self.current_trajectory[-1]['a'] = action
+        return action
+
+    def update_q(self, new_state, reward, game_end):
+        """Update the q value using the first visit Monte Carlo control algorithm."""
+        self.current_trajectory.append({'r': reward, 's': new_state})
+        if game_end:
+            self.replay_trajectory()
+            self.current_trajectory = []
+            self.action = None
+            self.state = None
+        else:
+            self.state = new_state
+
+    def get_num_states_visited(self):
+        return np.count_nonzero(np.any(self.sa_visits != 0, axis=1))
+
+    def get_percent_states_visited(self):
+        visited_state_count = self.get_num_states_visited()
+        return (visited_state_count / self.num_states) * 100
+
+    # Private API
+    def e_greedy(self, q_values):
+        """Implements epsilon greedy algorithm."""
+        rng = np.random.default_rng()
+        if self.epsilon <= rng.random():
+            best_action_idx = np.argmax(q_values)
+            return best_action_idx
+        else:
+            num_actions = q_values.size
+            idx = rng.integers(low=0, high=num_actions)
+            return idx
+
+    def replay_trajectory(self):
+        """Replays the trajectory implementing the first visit Monte Carlo algorithm."""
+        trajectory = self.current_trajectory
+        trajectory.reverse() # process the trajectory backwards
+        G = 0
+        for i in range(len(trajectory) - 1):
+            reward = trajectory[i]['r']
+            G = self.discount_factor * G + reward
+            # print(f'G is {G}')
+            state = trajectory[i + 1]['s']
+            action = trajectory[i + 1]['a']
+            has_duplicate = False
+            if i < len(trajectory) - 2:
+                has_duplicate = check_for_duplicates(trajectory[i+2:], state, action)
+            # print(f'Has duplicate is {has_duplicate}')
+            if not has_duplicate:
+                q = self.q[state][action]
+                n = self.sa_visits[state][action] + 1
+                self.sa_visits[state][action] += 1
+                updated_q = q + ((G - q) / n)
+                self.q[state][action] = updated_q
