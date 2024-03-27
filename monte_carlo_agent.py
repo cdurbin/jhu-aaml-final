@@ -38,7 +38,7 @@ class RlAgent:
         self.current_trajectory[-1]['a'] = action
         return action
 
-    def update_q(self, new_state, reward, game_end):
+    def learn(self, new_state, reward, game_end):
         """Update the q value using the first visit Monte Carlo control algorithm."""
         self.current_trajectory.append({'r': reward, 's': new_state})
         if game_end:

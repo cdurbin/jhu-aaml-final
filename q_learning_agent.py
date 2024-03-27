@@ -20,6 +20,7 @@ class QLearningAgent:
         return self.num_actions
 
     def select_action(self, state):
+        print(f'State is {state}')
         self.state = state
         q_values = self.q[state, ]
         action = self.e_greedy(q_values)
@@ -29,7 +30,7 @@ class QLearningAgent:
 
         return action
 
-    def update_q(self, new_state, reward, game_end):
+    def learn(self, new_state, reward, game_end):
         """Update the q value using the Q-learning algorithm."""
         next_state_q_values = self.q[new_state, ]
         max_q = np.max(next_state_q_values)

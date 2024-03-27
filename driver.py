@@ -1,6 +1,7 @@
 import monte_carlo_agent
 import q_learning_agent
 import blackjack_env
+import dqn_agent
 
 import numpy as np
 import os
@@ -35,6 +36,7 @@ def main(scenario=1):
         environment = blackjack_env.Blackjack()
         # agent = monte_carlo_agent.RlAgent()
         agent = q_learning_agent.QLearningAgent()
+        # agent = dqn_agent.DQNAgent()
         wins = 0
         ties = 0
         cumulative_rewards = 0
@@ -63,7 +65,8 @@ def main(scenario=1):
                     # print(f'Action selected is {action}')
                     new_state, reward, game_end = environment.execute_action(action)
                     cumulative_rewards += reward
-                    agent.update_q(new_state, reward, game_end)
+                    # agent.update_q(new_state, reward, game_end)
+                    agent.learn(new_state, reward, game_end)
                     current_state = new_state
                     if game_end:
                         if reward > 0:
@@ -91,7 +94,7 @@ def main(scenario=1):
                 while not game_end:
                     action = agent.select_action(current_state)
                     new_state, reward, game_end = environment.execute_action(action)
-                    agent.update_q(new_state, reward, game_end)
+                    agent.learn(new_state, reward, game_end)
                     current_state = new_state
                     if game_end:
                         if reward > 0:
