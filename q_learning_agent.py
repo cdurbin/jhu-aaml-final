@@ -4,13 +4,15 @@ class QLearningAgent:
     def __init__(self, alpha=0.1, epsilon=0.2, gamma=0.9):
         self.num_states = 203 + 1
         self.num_actions = 2
+        self.actions = list(range(self.num_actions))
         self.state = None
         self.action = None
         self.alpha = alpha
         self.epsilon = epsilon
         self.gamma = gamma
-        self.q = np.zeros((self.num_states, self.num_actions), dtype="float32")
-        self.sa_visits = np.zeros((self.num_states, self.num_actions), dtype="int")
+        self.q = {}
+        # self.q = np.zeros((self.num_states, self.num_actions), dtype="float32")
+        # self.sa_visits = np.zeros((self.num_states, self.num_actions), dtype="int")
 
     # Public API
     def get_number_of_states(self):
@@ -20,24 +22,58 @@ class QLearningAgent:
         return self.num_actions
 
     def select_action(self, state):
-        print(f'State is {state}')
+        # print(f'State is {state}')
         self.state = state
-        q_values = self.q[state, ]
+        q_values = []
+        for action in self.actions:
+            key = self.get_state_action_pair_key(state, action)
+            q_value = self.q.get(key, 0)
+            q_values.append(q_value)
+        # q_values = self.q[state, ]
         action = self.e_greedy(q_values)
         self.action = action
 
-        self.sa_visits[state][action] += 1
+        # self.sa_visits[state][action] += 1
 
         return action
 
+    def get_state_action_pair_key(self, state, action):
+        if isinstance(state, int):
+            return (state,action)
+        state_tuple = (state['agent_total'], state['usable_ace'], state['dealer_visible_total'], state['dealer_ace'], action)
+        return state_tuple
+        # state['action'] = action
+        # return state
+
+    # def get_all_state_action_pairs_for_state(self, state):
+    #     state_action_pairs = []
+    #     for action in self.actions:
+    #         key = state
+    #         key['action'] = action
+    #         q_value = self.q.get(key, 0)
+    #         state_action_pairs.append({key: q_value})
+    #     state_action_pairs.sort()
+    #     return state_action_pairs
+
+    def get_max_q_value(self, state):
+        q_values = []
+        for action in self.actions:
+            key = self.get_state_action_pair_key(state, action)
+            q_value = self.q.get(key, 0)
+            q_values.append(q_value)
+        return np.max(q_values)
+
     def learn(self, new_state, reward, game_end):
         """Update the q value using the Q-learning algorithm."""
-        next_state_q_values = self.q[new_state, ]
-        max_q = np.max(next_state_q_values)
-        current_q = self.q[self.state][self.action]
+        # next_state_q_values = self.q[new_state, ]
+        # max_q = np.max(next_state_q_values)
+        max_q = self.get_max_q_value(new_state)
+        key = self.get_state_action_pair_key(self.state, self.action)
+        current_q = self.q.get(key, 0)
+        # current_q = self.q[self.state][self.action]
         # The equation
         new_q_value = current_q + self.alpha * (reward + (self.gamma * max_q) - current_q)
-        self.q[self.state][self.action] = new_q_value
+        self.q[key] = new_q_value
         if game_end:
             self.action = None
             self.state = None
@@ -61,6 +97,6 @@ class QLearningAgent:
             best_action_idx = np.argmax(q_values)
             return best_action_idx
         else:
-            num_actions = q_values.size
+            num_actions = len(q_values)
             idx = rng.integers(low=0, high=num_actions)
             return idx
