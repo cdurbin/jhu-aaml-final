@@ -35,8 +35,8 @@ def main(scenario=1):
         # agents_percent_states_visited.append([])
         environment = blackjack_env.Blackjack()
         # agent = monte_carlo_agent.RlAgent()
-        agent = q_learning_agent.QLearningAgent()
-        # agent = dqn_agent.DQNAgent()
+        # agent = q_learning_agent.QLearningAgent()
+        agent = dqn_agent.DQNAgent()
         wins = 0
         ties = 0
         cumulative_rewards = 0

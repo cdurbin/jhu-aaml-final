@@ -92,6 +92,7 @@ class Blackjack:
         dealer_face_up_card = self.deck.deal_card()
         dealer_face_down_card = self.deck.deal_card()
         self.dealer_total = dealer_face_up_card['value'] + dealer_face_down_card['value']
+        self.dealer_visible_total = dealer_face_up_card['value']
         if dealer_face_up_card['value'] == 1 or dealer_face_down_card['value'] == 1:
             self.dealer_ace = True
             self.dealer_total += 10
