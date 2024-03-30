@@ -13,13 +13,16 @@ class RlAgent:
     def __init__(self):
         self.num_states = 203 # Note that only 202 are actually reachable
         self.num_actions = 2
+        self.actions = list(range(self.num_actions))
         self.state = None
         self.action = None
         self.epsilon = 0.15
         self.discount_factor = 1.0
         self.current_trajectory = []
-        self.q = np.zeros((self.num_states + 1, self.num_actions), dtype="float32")
-        self.sa_visits = np.zeros((self.num_states + 1, self.num_actions), dtype="int")
+        self.q = {}
+        # self.q = np.zeros((self.num_states + 1, self.num_actions), dtype="float32")
+        # self.sa_visits = np.zeros((self.num_states + 1, self.num_actions), dtype="int")
+        self.sa_visits = {}
 
     # Public API
     def get_number_of_states(self):
@@ -32,13 +35,25 @@ class RlAgent:
         if self.state is None:
             self.current_trajectory = [{'s': state}]
         self.state = state
-        q_values = self.q[state, ]
+        # q_values = self.q[state, ]
+        q_values = []
+        for action in self.actions:
+            key = self.get_state_action_pair_key(state, action)
+            q_value = self.q.get(key, 0)
+            q_values.append(q_value)
+
         action = self.e_greedy(q_values)
         self.action = action
         self.current_trajectory[-1]['a'] = action
         return action
 
-    def learn(self, new_state, reward, game_end):
+    def get_state_action_pair_key(self, state, action):
+        if isinstance(state, int):
+            return (state,action)
+        state_tuple = (state['agent_total'], state['usable_ace'], state['dealer_visible_total'], state['dealer_ace'], action)
+        return state_tuple
+
+    def learn(self, state, action, new_state, reward, game_end):
         """Update the q value using the first visit Monte Carlo control algorithm."""
         self.current_trajectory.append({'r': reward, 's': new_state})
         if game_end:
@@ -49,12 +64,12 @@ class RlAgent:
         else:
             self.state = new_state
 
-    def get_num_states_visited(self):
-        return np.count_nonzero(np.any(self.sa_visits != 0, axis=1))
+    # def get_num_states_visited(self):
+    #     return np.count_nonzero(np.any(self.sa_visits != 0, axis=1))
 
-    def get_percent_states_visited(self):
-        visited_state_count = self.get_num_states_visited()
-        return (visited_state_count / self.num_states) * 100
+    # def get_percent_states_visited(self):
+    #     visited_state_count = self.get_num_states_visited()
+    #     return (visited_state_count / self.num_states) * 100
 
     # Private API
     def e_greedy(self, q_values):
@@ -64,7 +79,8 @@ class RlAgent:
             best_action_idx = np.argmax(q_values)
             return best_action_idx
         else:
-            num_actions = q_values.size
+            # num_actions = q_values.size
+            num_actions = len(q_values)
             idx = rng.integers(low=0, high=num_actions)
             return idx
 
@@ -84,8 +100,13 @@ class RlAgent:
                 has_duplicate = check_for_duplicates(trajectory[i+2:], state, action)
             # print(f'Has duplicate is {has_duplicate}')
             if not has_duplicate:
-                q = self.q[state][action]
-                n = self.sa_visits[state][action] + 1
-                self.sa_visits[state][action] += 1
+                key = self.get_state_action_pair_key(state, action)
+                q = self.q.get(key, 0)
+                # q = self.q[state][action]
+                # n = self.sa_visits[state][action] + 1
+                n = self.sa_visits.get(key, 1)
+                # self.sa_visits[state][action] += 1
+                self.sa_visits[key] = n + 1
                 updated_q = q + ((G - q) / n)
-                self.q[state][action] = updated_q
+                self.q[key] = updated_q
+                # self.q[state][action] = updated_q

@@ -49,8 +49,7 @@ def main(scenario=1):
                 # print(f'Action selected is {action}')
                 new_state, reward, game_end = environment.execute_action(action)
                 cumulative_rewards += reward
-                # agent.update_q(new_state, reward, game_end)
-                agent.learn(new_state, reward, game_end)
+                agent.learn(current_state, action, new_state, reward, game_end)
                 current_state = new_state
                 if game_end:
                     if reward > 0:
