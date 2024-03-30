@@ -74,6 +74,7 @@ class DQNAgent:
             with torch.no_grad():
                 action_values = self.model(state_tensor)
             action = np.argmax(action_values.cpu().data.numpy())
+            # action = np.argmin(action_values.cpu().data.numpy())
         self.action = action
         return action
         # return np.argmax(action_values.cpu().data.numpy())
