@@ -21,9 +21,6 @@ class CardDeck:
                 card = { 'name': face_card, 'value': 10, 'suit': suit }
                 cards.append(card)
 
-        # self.cards = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
-        #               6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10,
-        #               10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.cards = cards
         self.deal_seq = []
         self.number_of_decks = number_of_decks
@@ -44,14 +41,6 @@ class Blackjack:
         self.dealer_total = 0
         self.dealer_ace = 0
         self.current_state = None
-        # self.num_states = 203
-        # self.num_actions = 2
-
-    # def get_number_of_states(self):
-    #     return self.num_states
-
-    # def get_number_of_actions(self):
-    #     return self.num_actions
 
     def get_state(self):
         return self.current_state
@@ -74,7 +63,6 @@ class Blackjack:
         # print("Agent drew a", new_card, "and now has", self.agent_total, "points.")
         if self.agent_total > 21:
             new_state = 201
-            # new_state = None      # 201 is the losing state
         else:
             new_state = self.construct_state()
         return new_state

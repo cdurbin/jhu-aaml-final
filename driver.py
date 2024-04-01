@@ -9,33 +9,30 @@ import sys
 
 # Usage: `python driver.py` to run the assignment as specified
 # To run a different test scenario (described below) run `python driver.py <scenario number>`
-def main(scenario=1):
-    """
-    There are three ways to run my code controlled by the passed in scenario number (1, 2, or 3).
-    1. Scenario 1: Run the test as specified by the assignment and capture the required metrics.
-    2. Scenario 2: Run additional training episodes to attempt to converge and then run a loop
-    at the end that only exploits to see win rates for optimal play.
-    3. Scenario 3: Run each agent until it has visited every state and track the number of episodes
-    required for each agent.
-    """
+def main(scenario=1, agent_type=1):
     print(f'Running scenario {scenario}')
     NUM_EPISODES = 2000
-    # if scenario == 2:
-    #     NUM_EPISODES = 10000
     NUM_AGENTS = 10
     agents_win_rates = []
     agents_win_rates_excluding_ties = []
     agents_cumulative_rewards = []
-    # agents_percent_states_visited = []
-    episodes_required = []
+    if agent_type == 1:
+        print('Using Monte Carlo agent')
+    elif agent_type == 2:
+        print('Using Q-learning agent')
+    else:
+        print('Using DQN agent')
     for a in range(NUM_AGENTS):
         agents_win_rates.append([])
         agents_win_rates_excluding_ties.append([])
         agents_cumulative_rewards.append([])
         environment = blackjack_env.Blackjack()
-        # agent = monte_carlo_agent.RlAgent()
-        # agent = q_learning_agent.QLearningAgent()
-        agent = dqn_agent.DQNAgent()
+        if agent_type == 1:
+            agent = monte_carlo_agent.RlAgent()
+        elif agent_type == 2:
+            agent = q_learning_agent.QLearningAgent()
+        else:
+            agent = dqn_agent.DQNAgent()
         wins = 0
         ties = 0
         cumulative_rewards = 0
@@ -113,4 +110,5 @@ if __name__ == "__main__":
             print("The passed in scenario must be an integer: 1 or 2.")
             exit(1)
 
-    main(scenario)
+    agent_type = 2
+    main(scenario, agent_type)
