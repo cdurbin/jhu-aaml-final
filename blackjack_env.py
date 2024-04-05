@@ -1,4 +1,5 @@
 import random
+import copy
 
 SUITS = ['club', 'spade', 'heart', 'diamond']
 
@@ -24,6 +25,8 @@ class CardDeck:
         self.cards = cards
         self.deal_seq = []
         self.number_of_decks = number_of_decks
+        self.initial_deck_state = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}
+        self.state = copy.deepcopy(self.initial_deck_state)
 
     def maybe_shuffle_cards(self):
         # Shuffle the cards if more than half have been dealt - no definitive source
@@ -31,12 +34,24 @@ class CardDeck:
         # cards being dealt.
         total_cards = 52 * self.number_of_decks
         if len(self.deal_seq) < 0.5 * total_cards:
+            # print('SHUFFLING...')
             combined_decks = self.cards * self.number_of_decks
+            # print('Before')
+            # print(combined_decks[50:54])
+            # print('After')
             random.shuffle(combined_decks)
+            # print(combined_decks[50:54])
             self.deal_seq = combined_decks
+            self.state = copy.deepcopy(self.initial_deck_state)
 
     def deal_card(self):
-        return self.deal_seq.pop(0)
+        next_card = self.deal_seq.pop(0)
+        # Note we can't see one of the dealer's cards until the end, but since this is
+        # called after we've placed our bet and the state won't be used until next hand
+        # it is fine to update the state while dealing
+        self.state[next_card['value']] += 1
+        return next_card
+
 
 class Blackjack:
     def __init__(self):
@@ -74,6 +89,9 @@ class Blackjack:
             new_state = self.construct_state()
         return new_state
 
+    def get_deck_state(self):
+        return self.deck.state
+
     def reset(self):
         self.deck.maybe_shuffle_cards()
         self.agent_total = 0
@@ -83,6 +101,9 @@ class Blackjack:
         self.dealer_ace = False
         self.current_state = None
 
+        return self.get_deck_state()
+
+    def deal_hand(self):
         # deal a face up card and a second card to the dealer
         dealer_face_up_card = self.deck.deal_card()
         dealer_face_down_card = self.deck.deal_card()
@@ -109,10 +130,11 @@ class Blackjack:
             # TBD - figure out what to do here since it will be important for bet size
             # But for now just shuffle again
             # self.reset()
+
             if self.dealer_total == 21:
                 self.current_state = 202    # tie game
             else:
-                self.current_state = 203    # agent wins
+                self.current_state = 303    # agent natural 1.5x win
 
         # otherwise, deal enough cards to the agent so that the total is >11
         else:
