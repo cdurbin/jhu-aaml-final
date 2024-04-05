@@ -25,16 +25,23 @@ class CardDeck:
         self.deal_seq = []
         self.number_of_decks = number_of_decks
 
-    def shuffle_cards(self):
-        self.deal_seq = random.sample(self.cards, 52 * self.number_of_decks)
+    def maybe_shuffle_cards(self):
+        # Shuffle the cards if more than half have been dealt - no definitive source
+        # but read that usually the decks are shuffled anytime between 40-60% of the
+        # cards being dealt.
+        total_cards = 52 * self.number_of_decks
+        if len(self.deal_seq) < 0.5 * total_cards:
+            combined_decks = self.cards * self.number_of_decks
+            random.shuffle(combined_decks)
+            self.deal_seq = combined_decks
 
     def deal_card(self):
         return self.deal_seq.pop(0)
 
 class Blackjack:
     def __init__(self):
-
-        self.deck = CardDeck()
+        number_of_decks = 4
+        self.deck = CardDeck(number_of_decks)
         self.agent_total = 0
         self.usable_ace = 0
         self.dealer_visible_total = 0
@@ -68,7 +75,7 @@ class Blackjack:
         return new_state
 
     def reset(self):
-        self.deck.shuffle_cards()
+        self.deck.maybe_shuffle_cards()
         self.agent_total = 0
         self.usable_ace = False
         self.dealer_visible_total = 0
