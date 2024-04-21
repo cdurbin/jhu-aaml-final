@@ -14,9 +14,12 @@ def state_to_inputs(state):
 class BetSizeDQNAgent:
     def __init__(self):
         self.action_size=2
-        self.replay_buffer_size=2000
+        self.replay_buffer_size=20000
         self.min_replay_size=50
-        self.batch_size=32
+        self.batch_size=50
+        # self.replay_buffer_size=1
+        # self.min_replay_size=1
+        # self.batch_size=1
         self.gamma=0.95
         self.epsilon=0.2
         self.epsilon_min=0.01

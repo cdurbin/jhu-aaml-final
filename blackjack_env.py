@@ -33,7 +33,8 @@ class CardDeck:
         # but read that usually the decks are shuffled anytime between 40-60% of the
         # cards being dealt.
         total_cards = 52 * self.number_of_decks
-        if len(self.deal_seq) < 0.5 * total_cards:
+        # if len(self.deal_seq) < 0.5 * total_cards:
+        if len(self.deal_seq) < 0.25 * total_cards:
             # print('SHUFFLING...')
             combined_decks = self.cards * self.number_of_decks
             # print('Before')
@@ -55,7 +56,7 @@ class CardDeck:
 
 class Blackjack:
     def __init__(self):
-        number_of_decks = 4
+        number_of_decks = 1
         self.deck = CardDeck(number_of_decks)
         self.agent_total = 0
         self.usable_ace = 0

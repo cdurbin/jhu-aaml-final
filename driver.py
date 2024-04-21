@@ -16,7 +16,9 @@ def main(scenario=1, agent_type=1):
     print(f'Running scenario {scenario}')
     # NUM_EPISODES = 2000
     # NUM_AGENTS = 10
-    NUM_EPISODES = 400000
+    # NUM_EPISODES = 100000000
+    NUM_EPISODES = 100000
+    # NUM_EPISODES = 4000
     NUM_AGENTS = 1
     agents_win_rates = []
     agents_win_rates_excluding_ties = []
@@ -64,10 +66,10 @@ def main(scenario=1, agent_type=1):
                 bet_reward = 1.5
                 if current_bet == 0:
                     bet_reward = -1.5
-                game_end = True
+                # game_end = True
             elif current_state == 202:
                 bet_reward = 0
-                game_end = True
+                # game_end = True
 
             # Do until the game ends:
             while not game_end:
@@ -86,16 +88,17 @@ def main(scenario=1, agent_type=1):
                     else:
                         agent_balance -= BET_SIZE[current_bet]
                     # Update the bet size agent model
-                    bet_reward = reward
+                    if bet_reward != 1.5:
+                        bet_reward = reward
                     if current_bet == 0: # Small size bet - expected to lose
                         bet_reward = -1 * bet_reward # Reward a loss and punish a win
 
-            opposite_bet = 0
-            if current_bet == 0:
-                opposite_bet = 1
+            # opposite_bet = 0
+            # if current_bet == 0:
+            #     opposite_bet = 1
 
             bet_agent.learn(deck_state, current_bet, deck_state, bet_reward, True)
-            bet_agent.learn(deck_state, opposite_bet, deck_state, -bet_reward, True)
+            # bet_agent.learn(deck_state, opposite_bet, deck_state, -bet_reward, True)
 
             if scenario == 1:
                 agents_win_rates[a].append(wins / (i + 1.0))
