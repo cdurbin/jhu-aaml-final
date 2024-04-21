@@ -8,16 +8,18 @@ import random
 class DQN(nn.Module):
     def __init__(self, num_features, action_size, hidden_size):
         super(DQN, self).__init__()
-        self.inputs = nn.Linear(num_features, hidden_size)
+        self.inputs = nn.Linear(num_features, hidden_size * 2)
         self.relu = nn.ReLU()
-        self.hidden = nn.Linear(hidden_size, hidden_size)
+        self.hidden1 = nn.Linear(hidden_size * 2, hidden_size * 2)
+        self.hidden2 = nn.Linear(hidden_size * 2, hidden_size)
         self.outputs = nn.Linear(hidden_size, action_size)
 
     def forward(self, x):
         # print(f'x is {x}')
         x = torch.FloatTensor(x)
         x = self.relu(self.inputs(x))
-        x = self.relu(self.hidden(x))
+        x = self.relu(self.hidden1(x))
+        x = self.relu(self.hidden2(x))
         return self.outputs(x)
 
 def state_to_inputs(state):
@@ -26,12 +28,18 @@ def state_to_inputs(state):
     elif isinstance(state, int):
         return [0, 0, 0, 0, state]
     else:
-        return [state['agent_total'], state['usable_ace'], state['dealer_visible_total'], state['dealer_ace'], 200]
+        return [
+            state['agent_total'],
+            state['usable_ace'],
+            state['dealer_visible_total'],
+            state['dealer_ace'],
+            200
+        ]
 
 class DQNAgent:
     def __init__(self):
         self.action_size=2
-        self.replay_buffer_size=2000
+        self.replay_buffer_size=1000000
         self.min_replay_size=50
         self.batch_size=32
         self.gamma=0.95
@@ -41,7 +49,7 @@ class DQNAgent:
         self.learning_rate=0.001
         self.memory = deque(maxlen=self.replay_buffer_size)
         self.num_features = 5
-        self.hidden_size = 24
+        self.hidden_size = 12
         self.model = DQN(self.num_features, self.action_size, self.hidden_size)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self.criterion = nn.MSELoss()
