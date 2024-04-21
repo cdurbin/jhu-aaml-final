@@ -192,7 +192,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-b', '--bet-sizes',
                 type=bool,
-                default=False,
+                default=True,
                 help='Whether to attempt to learn bet sizes.')
 
     args = parser.parse_args()

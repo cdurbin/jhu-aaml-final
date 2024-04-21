@@ -17,7 +17,7 @@ class DQN(nn.Module):
 
     def forward(self, x):
         # print(f'x is {x}')
-        x = torch.FloatTensor(x)
+        # x = torch.FloatTensor(x).to(self.device)
         x = self.relu(self.inputs(x))
         x = self.relu(self.hidden1(x))
         x = self.relu(self.hidden2(x))
@@ -51,17 +51,20 @@ class DQNAgent:
         self.memory = deque(maxlen=self.replay_buffer_size)
         self.num_features = 5
         self.hidden_size = 12
-        self.model = DQN(self.num_features, self.action_size, self.hidden_size)
+        # self.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+        # self.device = 'cpu'
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f'Device is {self.device}')
+        self.model = DQN(self.num_features, self.action_size, self.hidden_size).to(self.device)
         self.target_model = copy.deepcopy(self.model)
         self.update_target_every = 50
         self.step_count = 0
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self.criterion = nn.MSELoss()
-        self.device = 'cpu'
 
     def select_action(self, state):
         state_input = state_to_inputs(state)
-        state_tensor = torch.FloatTensor([state_input]).to(torch.device(self.device))  # Adds batch dimension
+        state_tensor = torch.FloatTensor([state_input]).to(self.device)  # Adds batch dimension
         if np.random.rand() <= self.epsilon:
             action = random.randrange(self.action_size)
         else:
