@@ -16,17 +16,19 @@ class BetSizeDQNAgent:
     def __init__(self):
         self.action_size=2
         self.replay_buffer_size=1000000
-        self.min_replay_size=50
-        self.batch_size=32
+        self.min_replay_size=500
+        self.batch_size=128
         self.gamma=0.95
         self.epsilon=1.0
-        self.epsilon_min=0.01
+        self.epsilon_min=0.0001
         # self.epsilon_decay=0.995
-        self.epsilon_decay=0.99999
+        self.epsilon_decay=0.999995
+        # self.epsilon_decay=0.9995
         self.learning_rate=0.001
+        # self.learning_rate=0.001
         self.memory = deque(maxlen=self.replay_buffer_size)
-        self.num_features = 10
-        self.hidden_size = 12
+        self.num_features = 11
+        self.hidden_size = 64
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
         # self.device = 'cpu'
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

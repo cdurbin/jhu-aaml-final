@@ -48,16 +48,22 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
         ties = 0
         cumulative_rewards = 0
         agent_balance = 0
+        last_balance = agent_balance
         current_bet = 0
+        bet_counts = {0: 0, 1: 0}
         for i in range(num_episodes):
             if (i % 1000 == 0):
                 print(f'Starting episode {i + 1}')
+                if use_bet_sizes:
+                    print(f'Bet counts: {bet_counts}, balance change: {agent_balance - last_balance}')
+                    last_balance = agent_balance
             # reset the game and observe the current state
             deck_state = environment.reset()
 
             # TODO take the deck state and pass it in to the bet agent to get the bet
             if use_bet_sizes:
                 current_bet = bet_agent.select_action(deck_state)
+                bet_counts[current_bet] += 1
 
             # If current_bet is 0 I expect to lose and if current_bet is 1 I expect to win
             current_state = environment.deal_hand()
@@ -158,6 +164,7 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
     np.save('output/agents_balance', agents_balance)
     if use_bet_sizes:
         np.save('output/agents_bet_sizes', agents_bet_sizes)
+        print(f'Bet counts 0: {bet_counts[0]} and 1: {bet_counts[1]}')
 
     print("Program completed successfully.")
 

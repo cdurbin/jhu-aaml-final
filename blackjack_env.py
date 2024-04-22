@@ -25,7 +25,9 @@ class CardDeck:
         self.cards = cards
         self.deal_seq = []
         self.number_of_decks = number_of_decks
-        self.initial_deck_state = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}
+        self.total_cards = 52 * self.number_of_decks
+        # self.initial_deck_state = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}
+        self.initial_deck_state = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 'deck_percent': 0.0}
         self.state = copy.deepcopy(self.initial_deck_state)
 
     def maybe_shuffle_cards(self):
@@ -34,7 +36,7 @@ class CardDeck:
         # cards being dealt.
         total_cards = 52 * self.number_of_decks
         # if len(self.deal_seq) < 0.5 * total_cards:
-        if len(self.deal_seq) < 0.25 * total_cards:
+        if len(self.deal_seq) < 0.1 * total_cards:
             # print('SHUFFLING...')
             combined_decks = self.cards * self.number_of_decks
             # print('Before')
@@ -46,11 +48,16 @@ class CardDeck:
             self.state = copy.deepcopy(self.initial_deck_state)
 
     def deal_card(self):
+        if len(self.deal_seq) == 0:
+            self.maybe_shuffle_cards()
         next_card = self.deal_seq.pop(0)
         # Note we can't see one of the dealer's cards until the end, but since this is
         # called after we've placed our bet and the state won't be used until next hand
         # it is fine to update the state while dealing
         self.state[next_card['value']] += 1
+
+        deck_percent = (self.total_cards - len(self.deal_seq)) / self.total_cards
+        self.state['deck_percent'] = deck_percent
         return next_card
 
 
