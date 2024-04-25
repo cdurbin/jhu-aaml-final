@@ -12,7 +12,7 @@ import argparse
 
 BET_SIZE = {0: 10, 1: 500}
 
-def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
+def main(scenario, agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Running scenario {scenario} with {num_agents} {agent_type} agents and {num_episodes} episodes')
     agents_win_rates = []
     agents_win_rates_excluding_ties = []
@@ -43,7 +43,13 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
         else:
             print(f'Unknown agent type {agent_type}')
             exit(1)
-        bet_agent = bet_size_dqn_agent.BetSizeDQNAgent()
+        bet_agent = None
+        if bet_agent_type == 'dqn':
+            bet_agent = bet_size_dqn_agent.BetSizeDQNAgent()
+        elif bet_agent_type == 'random':
+            bet_agent = random_agent.RandomAgent()
+        elif bet_agent_type == 'fixed':
+            bet_agent = random_agent.FixedAgent(fixed_action=0)
         wins = 0
         ties = 0
         cumulative_rewards = 0
@@ -54,14 +60,14 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
         for i in range(num_episodes):
             if (i % 1000 == 0):
                 print(f'Starting episode {i + 1}')
-                if use_bet_sizes:
+                if bet_agent:
                     print(f'Bet counts: {bet_counts}, balance change: {agent_balance - last_balance}')
                     last_balance = agent_balance
             # reset the game and observe the current state
             deck_state = environment.reset()
 
             # TODO take the deck state and pass it in to the bet agent to get the bet
-            if use_bet_sizes:
+            if bet_agent:
                 current_bet = bet_agent.select_action(deck_state)
                 bet_counts[current_bet] += 1
 
@@ -104,7 +110,7 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
             # if current_bet == 0:
             #     opposite_bet = 1
 
-            if use_bet_sizes:
+            if bet_agent:
                 bet_agent.learn(deck_state, current_bet, deck_state, bet_reward, True)
             # bet_agent.learn(deck_state, opposite_bet, deck_state, -bet_reward, True)
 
@@ -112,7 +118,7 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
                 agents_win_rates[a].append(wins / (i + 1.0))
                 agents_win_rates_excluding_ties[a].append(wins / max([1, (i + 1.0 - ties)]))
                 agents_cumulative_rewards[a].append(cumulative_rewards)
-                if use_bet_sizes:
+                if bet_agent:
                     agents_balance[a].append(agent_balance)
                     agents_bet_sizes[a].append(BET_SIZE[current_bet])
 
@@ -120,7 +126,7 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
         if scenario == 1:
             print(f"Agent {a} Win rate: {wins / (num_episodes):.2f}, Win rate excluding ties: {wins / (num_episodes - ties):.2f}")
             print(f"Agent {a} Wins: {wins}, losses: {(num_episodes - ties - wins)}, ties: {ties}")
-            if use_bet_sizes:
+            if bet_agent:
                 print(f'Agent {a} Final balance: {agent_balance}')
 
         # Exploit only
@@ -146,7 +152,7 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
                         agents_cumulative_rewards[a].append(cumulative_rewards)
             print(f"Agent {a} win rate while exploiting and excluding ties: {wins / (num_episodes - ties):.2f}")
             print(f"Agent {a} wins: {wins}, losses: {(num_episodes - ties - wins)}, ties: {ties}\n")
-            if use_bet_sizes:
+            if bet_agent:
                 print(f'Agent {a} Final balance: {agents_balance}')
 
     if scenario == 1 or scenario == 2:
@@ -162,7 +168,7 @@ def main(scenario, agent_type, num_episodes, num_agents, use_bet_sizes):
     np.save('output/agents_win_rates', agents_win_rates)
     np.save('output/agents_cumulative_rewards', agents_cumulative_rewards)
     np.save('output/agents_balance', agents_balance)
-    if use_bet_sizes:
+    if bet_agent:
         np.save('output/agents_bet_sizes', agents_bet_sizes)
         print(f'Bet counts 0: {bet_counts[0]} and 1: {bet_counts[1]}')
 
@@ -197,10 +203,15 @@ if __name__ == "__main__":
                     default=1,
                     help='Number of agents (positive integer).')
 
-    parser.add_argument('-b', '--bet-sizes',
-                type=bool,
-                default=True,
-                help='Whether to attempt to learn bet sizes.')
+    # parser.add_argument('-b', '--bet-sizes',
+    #             type=bool,
+    #             default=True,
+    #             help='Whether to attempt to learn bet sizes.')
+
+    parser.add_argument('-b', '--bet-agent-type',
+                        choices=['none', 'random', 'fixed', 'dqn'],
+                        default='none',
+                        help='The agent to use for choosing bet size - none means do not track bet sizes.')
 
     args = parser.parse_args()
-    main(args.scenario, args.agent_type, args.num_episodes, args.num_agents, args.bet_sizes)
+    main(args.scenario, args.agent_type, args.num_episodes, args.num_agents, args.bet_agent_type)
