@@ -58,11 +58,13 @@ def main(scenario, agent_type, num_episodes, num_agents, bet_agent_type):
         current_bet = 0
         bet_counts = {0: 0, 1: 0}
         for i in range(num_episodes):
-            if (i % 1000 == 0):
-                print(f'Starting episode {i + 1}')
+            if (i % 5000 == 0):
                 if bet_agent:
-                    print(f'Bet counts: {bet_counts}, balance change: {agent_balance - last_balance}')
+                    print(f'Starting episode {i + 1} Bet counts: {bet_counts}, balance change: {agent_balance - last_balance}')
                     last_balance = agent_balance
+                else:
+                    print(f'Starting episode {i + 1}')
+
             # reset the game and observe the current state
             deck_state = environment.reset()
 
@@ -101,8 +103,10 @@ def main(scenario, agent_type, num_episodes, num_agents, bet_agent_type):
                     else:
                         agent_balance -= BET_SIZE[current_bet]
                     # Update the bet size agent model
-                    if bet_reward != 1.5:
+                    if abs(bet_reward) != 1.5:
                         bet_reward = reward
+                    else: # Agent had a natural blackjack which pays out an extra 0.5
+                        agent_balance += 0.5 * BET_SIZE[current_bet]
                     if current_bet == 0: # Small size bet - expected to lose
                         bet_reward = -1 * bet_reward # Reward a loss and punish a win
 
@@ -110,6 +114,8 @@ def main(scenario, agent_type, num_episodes, num_agents, bet_agent_type):
             # if current_bet == 0:
             #     opposite_bet = 1
 
+            # episode_returns.append(episode_return)
+            # self.all_sum_rewards_last_30[agent_index, i] = np.mean(episode_returns[-30:])
             if bet_agent:
                 bet_agent.learn(deck_state, current_bet, deck_state, bet_reward, True)
             # bet_agent.learn(deck_state, opposite_bet, deck_state, -bet_reward, True)
