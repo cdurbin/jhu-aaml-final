@@ -94,7 +94,7 @@ class BetSizeDQNAgent:
     def learn(self, state, action, new_state, reward, done):
         # print(f'Learn: State is {state}, new_state is {new_state}')
         self.memory.append((state, action, reward, new_state))
-        opposite_action = 1 if action is 0 else 0
+        opposite_action = 1 if action == 0 else 0
         opposite_reward = -reward
         self.memory.append((state, opposite_action, opposite_reward, new_state))
         self.replay()
