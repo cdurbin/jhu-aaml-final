@@ -3,8 +3,8 @@ import numpy as np
 
 def save_cumulative_rewards_plot(agents_cumulative_rewards, output_file, agent_label):
     # agents_cumulative_rewards = np.load(cumulative_rewards_file)
-    for i in range(agents_cumulative_rewards.shape[0]):
-        plt.plot(agents_cumulative_rewards[i], label=f'Agent {i+1}')
+    for i, rewards in enumerate(agents_cumulative_rewards):
+        plt.plot(rewards, label=f'Agent {i+1}')
 
     plt.title(f'{agent_label} Agent Cumulative Rewards Over Time')
     plt.xlabel('Episodes')
@@ -15,8 +15,8 @@ def save_cumulative_rewards_plot(agents_cumulative_rewards, output_file, agent_l
     plt.close()
 
 def save_agent_balance_plot(agents_balance, output_file, agent_label):
-    for i in range(agents_balance.shape[0]):
-        plt.plot(agents_balance[i], label=f'Agent {i+1}')
+    for i, balance in enumerate(agents_balance):
+        plt.plot(balance, label=f'Agent {i+1}')
 
     plt.title(f'{agent_label} Agent Balance Over Time')
     plt.xlabel('Episodes')
@@ -59,11 +59,10 @@ def save_bet_sizes_plot_alt(agents_bet_sizes, output_file, agent_label):
     plt.close()
 
 def save_bet_sizes_plot(agents_bet_sizes, output_file, agent_label):
-    for i in range(agents_bet_sizes.shape[0]):
-        data = agents_bet_sizes[i]
-        choices = np.array(data)
+    for i, bet_sizes in enumerate(agents_bet_sizes):
+        choices = np.array(bet_sizes)
         cumulative_counts_500 = np.cumsum(choices == 500)
-        cumulative_percentage_500 = (cumulative_counts_500 / np.arange(1, len(data) + 1)) * 100
+        cumulative_percentage_500 = (cumulative_counts_500 / np.arange(1, len(bet_sizes) + 1)) * 100
         # episodes = np.arange(1, len(data) + 1)
         # plt.figure(figsize=(10, 5))
         # plt.plot(episodes, cumulative_percentage_500, label=f'Agent {i+1}')
@@ -79,8 +78,8 @@ def save_bet_sizes_plot(agents_bet_sizes, output_file, agent_label):
     plt.close()
 
 def save_win_rates_plot(agents_win_rates, output_file, agent_label):
-    for i in range(agents_win_rates.shape[0]):
-        plt.plot(agents_win_rates[i], label=f'Agent {i+1}')
+    for i, win_rates in enumerate(agents_win_rates):
+        plt.plot(win_rates, label=f'Agent {i+1}')
 
     plt.title(f'{agent_label} Agent Win Rates Over Time')
     plt.xlabel('Episodes')

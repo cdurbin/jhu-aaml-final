@@ -77,10 +77,10 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
 
                 plots.generate_and_save_plots(
                     timestamp, output_dir, AGENT_LABELS[agent_type],
-                    np.array(agents_win_rates),
-                    np.array(agents_cumulative_rewards),
-                    np.array(agents_balance),
-                    np.array(agents_bet_sizes)
+                    agents_win_rates,
+                    agents_cumulative_rewards,
+                    agents_balance,
+                    agents_bet_sizes
                 )
 
             # reset the game and observe the current state
@@ -181,10 +181,10 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
 
     plots.generate_and_save_plots(
         timestamp, output_dir, AGENT_LABELS[agent_type],
-        np.array(agents_win_rates),
-        np.array(agents_cumulative_rewards),
-        np.array(agents_balance),
-        np.array(agents_bet_sizes)
+        agents_win_rates,
+        agents_cumulative_rewards,
+        agents_balance,
+        agents_bet_sizes
     )
 
     # Save off the files to use for analysis and generating charts
