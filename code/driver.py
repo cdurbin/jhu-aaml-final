@@ -7,8 +7,8 @@ import random_agent
 
 import numpy as np
 import os
-import sys
 import argparse
+from datetime import datetime
 
 BET_SIZE = {0: 10, 1: 500}
 
@@ -156,13 +156,14 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Mean cumulative rewards: {avg_cumulative_rewards[-1]:.1f}')
 
     # Save off the files to use for analysis and generating charts
+    timestamp = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     output_dir = '../output'
     os.makedirs(output_dir, exist_ok=True)
-    np.save(f'{output_dir}/agents_win_rates', agents_win_rates)
-    np.save(f'{output_dir}/agents_cumulative_rewards', agents_cumulative_rewards)
-    np.save(f'{output_dir}/agents_balance', agents_balance)
+    np.save(f'{output_dir}/{timestamp}_agents_win_rates', agents_win_rates)
+    np.save(f'{output_dir}/{timestamp}_agents_cumulative_rewards', agents_cumulative_rewards)
+    np.save(f'{output_dir}/{timestamp}_agents_balance', agents_balance)
     if bet_agent:
-        np.save(f'{output_dir}/agents_bet_sizes', agents_bet_sizes)
+        np.save(f'{output_dir}/{timestamp}_agents_bet_sizes', agents_bet_sizes)
         print(f'Bet counts 0: {bet_counts[0]} and 1: {bet_counts[1]}')
 
     print("Program completed successfully.")
