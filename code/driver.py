@@ -4,13 +4,25 @@ import blackjack_env
 import dqn_agent
 import bet_size_dqn_agent
 import random_agent
+import plots
 
 import numpy as np
 import os
 import argparse
 from datetime import datetime
 
-BET_SIZE = {0: 10, 1: 500}
+BET_SIZE = {
+    0: 10,
+    1: 500
+}
+
+AGENT_LABELS = {
+    'dqn': 'DQN',
+    'monte-carlo': 'Monte Carlo',
+    'q-learning': 'Q-Learning',
+    'random': 'Random',
+    'fixed': 'Fixed'
+}
 
 def main(agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Running with {num_agents} {agent_type} agents and {num_episodes} episodes')
@@ -155,10 +167,19 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
     avg_cumulative_rewards = np.mean(agents_cumulative_rewards, axis=0)
     print(f'Mean cumulative rewards: {avg_cumulative_rewards[-1]:.1f}')
 
-    # Save off the files to use for analysis and generating charts
     timestamp = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     output_dir = '../output'
     os.makedirs(output_dir, exist_ok=True)
+
+    plots.generate_and_save_plots(
+        timestamp, output_dir, AGENT_LABELS[agent_type],
+        np.array(agents_win_rates),
+        np.array(agents_cumulative_rewards),
+        np.array(agents_balance),
+        np.array(agents_bet_sizes)
+    )
+
+    # Save off the files to use for analysis and generating charts
     np.save(f'{output_dir}/{timestamp}_agents_win_rates', agents_win_rates)
     np.save(f'{output_dir}/{timestamp}_agents_cumulative_rewards', agents_cumulative_rewards)
     np.save(f'{output_dir}/{timestamp}_agents_balance', agents_balance)
