@@ -156,12 +156,13 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Mean cumulative rewards: {avg_cumulative_rewards[-1]:.1f}')
 
     # Save off the files to use for analysis and generating charts
-    os.makedirs('output', exist_ok=True)
-    np.save('output/agents_win_rates', agents_win_rates)
-    np.save('output/agents_cumulative_rewards', agents_cumulative_rewards)
-    np.save('output/agents_balance', agents_balance)
+    output_dir = '../output'
+    os.makedirs(output_dir, exist_ok=True)
+    np.save(f'{output_dir}/agents_win_rates', agents_win_rates)
+    np.save(f'{output_dir}/agents_cumulative_rewards', agents_cumulative_rewards)
+    np.save(f'{output_dir}/agents_balance', agents_balance)
     if bet_agent:
-        np.save('output/agents_bet_sizes', agents_bet_sizes)
+        np.save(f'{output_dir}/agents_bet_sizes', agents_bet_sizes)
         print(f'Bet counts 0: {bet_counts[0]} and 1: {bet_counts[1]}')
 
     print("Program completed successfully.")
