@@ -22,8 +22,8 @@ class BetSizeDQNAgent:
         self.epsilon=1.0
         self.epsilon_min=0.0001
         # self.epsilon_decay=0.995
-        self.epsilon_decay=0.999995
-        # self.epsilon_decay=0.9995
+        # self.epsilon_decay=0.999995
+        self.epsilon_decay=0.99995
         self.learning_rate=0.001
         # self.learning_rate=0.001
         self.memory = deque(maxlen=self.replay_buffer_size)
@@ -34,7 +34,7 @@ class BetSizeDQNAgent:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f'Device is {self.device}')
         self.model = DQN(self.num_features, self.action_size, self.hidden_size).to(self.device)
-        self.target_model = copy.deepcopy(self.model)
+        self.target_model = copy.deepcopy(self.model).to(self.device)
         self.update_target_every = 50
         self.save_model_every = 5000
         self.step_count = 0
@@ -85,14 +85,16 @@ class BetSizeDQNAgent:
         if self.step_count % self.update_target_every == 0:
             self.target_model.load_state_dict(self.model.state_dict())
 
-
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
         if self.step_count % self.save_model_every == 0:
-            print(f'Step {self.step_count}: epsilon is now {self.epsilon:.3f}')
+            print(f'Step {self.step_count + 1}: epsilon is now {self.epsilon:.4f}')
 
     def learn(self, state, action, new_state, reward, done):
         # print(f'Learn: State is {state}, new_state is {new_state}')
         self.memory.append((state, action, reward, new_state))
+        opposite_action = 1 if action is 0 else 0
+        opposite_reward = -reward
+        self.memory.append((state, opposite_action, opposite_reward, new_state))
         self.replay()

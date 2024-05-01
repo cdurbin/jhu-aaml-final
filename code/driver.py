@@ -26,6 +26,10 @@ AGENT_LABELS = {
 
 def main(agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Running with {num_agents} {agent_type} agents and {num_episodes} episodes')
+    timestamp = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    output_dir = '../output'
+    os.makedirs(output_dir, exist_ok=True)
+
     agents_win_rates = []
     agents_win_rates_excluding_ties = []
     agents_cumulative_rewards = []
@@ -70,6 +74,14 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
                     last_balance = agent_balance
                 else:
                     print(f'Starting episode {i + 1}')
+
+                plots.generate_and_save_plots(
+                    timestamp, output_dir, AGENT_LABELS[agent_type],
+                    np.array(agents_win_rates),
+                    np.array(agents_cumulative_rewards),
+                    np.array(agents_balance),
+                    np.array(agents_bet_sizes)
+                )
 
             # reset the game and observe the current state
             deck_state = environment.reset()
@@ -166,10 +178,6 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Mean win rate: {avg_win_rate[-1]:.2f}, Mean win rate excluding ties: {avg_win_rate_no_ties[-1]:.2f}')
     avg_cumulative_rewards = np.mean(agents_cumulative_rewards, axis=0)
     print(f'Mean cumulative rewards: {avg_cumulative_rewards[-1]:.1f}')
-
-    timestamp = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    output_dir = '../output'
-    os.makedirs(output_dir, exist_ok=True)
 
     plots.generate_and_save_plots(
         timestamp, output_dir, AGENT_LABELS[agent_type],
