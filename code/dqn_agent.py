@@ -72,6 +72,7 @@ class DQNAgent:
             with torch.no_grad():
                 action_values = self.model(state_tensor)
             action = np.argmax(action_values.cpu().data.numpy())
+            self.model.train()
             # Uncomment to test choosing the worst action as a sanity check the network is learning
             # action = np.argmin(action_values.cpu().data.numpy())
         return action

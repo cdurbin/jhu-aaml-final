@@ -31,11 +31,11 @@ class BetSizeDQNAgent:
         self.hidden_size = 64
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
         # self.device = 'cpu'
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(f'Device is {self.device}')
         self.model = DQN(self.num_features, self.action_size, self.hidden_size).to(self.device)
         self.target_model = copy.deepcopy(self.model).to(self.device)
-        self.update_target_every = 50
+        self.update_target_every = 5000
         self.save_model_every = 5000
         self.step_count = 0
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
@@ -50,7 +50,9 @@ class BetSizeDQNAgent:
             self.model.eval()
             with torch.no_grad():
                 action_values = self.model(state_tensor)
-            action = np.argmax(action_values.cpu().data.numpy())
+            # action = np.argmax(action_values.cpu().data.numpy())
+            action = torch.argmax(action_values).item()
+            self.model.train()
             # Uncomment to test choosing the worst action as a sanity check the network is learning
             # action = np.argmin(action_values.cpu().data.numpy())
         return action
@@ -66,10 +68,16 @@ class BetSizeDQNAgent:
         rewards = [s[2] for s in minibatch]
         next_states = [state_to_inputs(s[3]) for s in minibatch]
 
-        states = torch.FloatTensor(states).to(self.device)
-        actions = torch.LongTensor(actions).unsqueeze(-1).to(self.device)
-        rewards = torch.FloatTensor(rewards).to(self.device)
-        next_states = torch.FloatTensor(next_states).to(self.device)
+        # states = torch.FloatTensor(states).to(self.device)
+        # actions = torch.LongTensor(actions).unsqueeze(-1).to(self.device)
+
+        states = torch.tensor(states, device=self.device, dtype=torch.float)
+        actions = torch.tensor(actions, device=self.device, dtype=torch.long).unsqueeze(-1)
+        rewards = torch.tensor(rewards, device=self.device, dtype=torch.float)
+        next_states = torch.tensor(next_states, device=self.device, dtype=torch.float)
+
+        # rewards = torch.FloatTensor(rewards).to(self.device)
+        # next_states = torch.FloatTensor(next_states).to(self.device)
 
         current_q_values = self.model(states).gather(1, actions)
         next_q_values = self.target_model(next_states).max(1)[0].detach()
