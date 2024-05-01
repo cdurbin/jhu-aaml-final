@@ -6,21 +6,48 @@ from collections import deque
 import random
 import copy
 
+# class DQN(nn.Module):
+#     def __init__(self, num_features, action_size, hidden_size):
+#         super(DQN, self).__init__()
+#         self.inputs = nn.Linear(num_features, hidden_size * 2)
+#         self.relu = nn.ReLU()
+#         self.hidden1 = nn.Linear(hidden_size * 2, hidden_size * 2)
+#         self.hidden2 = nn.Linear(hidden_size * 2, hidden_size)
+#         self.outputs = nn.Linear(hidden_size, action_size)
+
+#     def forward(self, x):
+#         # print(f'x is {x}')
+#         # x = torch.FloatTensor(x).to(self.device)
+#         x = self.relu(self.inputs(x))
+#         x = self.relu(self.hidden1(x))
+#         x = self.relu(self.hidden2(x))
+#         return self.outputs(x)
+
 class DQN(nn.Module):
     def __init__(self, num_features, action_size, hidden_size):
         super(DQN, self).__init__()
         self.inputs = nn.Linear(num_features, hidden_size * 2)
+        self.bn1 = nn.BatchNorm1d(hidden_size * 2)  # Batch normalization layer after first linear layer
         self.relu = nn.ReLU()
         self.hidden1 = nn.Linear(hidden_size * 2, hidden_size * 2)
+        self.bn2 = nn.BatchNorm1d(hidden_size * 2)  # Batch normalization layer after second linear layer
         self.hidden2 = nn.Linear(hidden_size * 2, hidden_size)
+        self.bn3 = nn.BatchNorm1d(hidden_size)  # Batch normalization layer after third linear layer
         self.outputs = nn.Linear(hidden_size, action_size)
 
     def forward(self, x):
-        # print(f'x is {x}')
-        # x = torch.FloatTensor(x).to(self.device)
-        x = self.relu(self.inputs(x))
-        x = self.relu(self.hidden1(x))
-        x = self.relu(self.hidden2(x))
+        x = self.inputs(x)
+        x = self.bn1(x)  # Apply batch normalization
+        x = self.relu(x)
+
+        x = self.hidden1(x)
+        x = self.bn2(x)  # Apply batch normalization
+        x = self.relu(x)
+
+        x = self.hidden2(x)
+        x = self.bn3(x)  # Apply batch normalization
+        x = self.relu(x)
+
         return self.outputs(x)
 
 def state_to_inputs(state):

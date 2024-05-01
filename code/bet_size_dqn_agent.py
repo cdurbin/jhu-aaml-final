@@ -18,12 +18,12 @@ class BetSizeDQNAgent:
         self.replay_buffer_size=1000000
         self.min_replay_size=500
         self.batch_size=128
-        self.gamma=0.95
+        self.gamma=0.995
         self.epsilon=1.0
         self.epsilon_min=0.0001
         # self.epsilon_decay=0.995
-        # self.epsilon_decay=0.999995
-        self.epsilon_decay=0.99995
+        self.epsilon_decay=0.999995
+        # self.epsilon_decay=0.99995
         self.learning_rate=0.001
         # self.learning_rate=0.001
         self.memory = deque(maxlen=self.replay_buffer_size)
@@ -35,7 +35,7 @@ class BetSizeDQNAgent:
         print(f'Device is {self.device}')
         self.model = DQN(self.num_features, self.action_size, self.hidden_size).to(self.device)
         self.target_model = copy.deepcopy(self.model).to(self.device)
-        self.update_target_every = 5000
+        self.update_target_every = 500
         self.save_model_every = 5000
         self.step_count = 0
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
@@ -102,7 +102,7 @@ class BetSizeDQNAgent:
     def learn(self, state, action, new_state, reward, done):
         # print(f'Learn: State is {state}, new_state is {new_state}')
         self.memory.append((state, action, reward, new_state))
-        opposite_action = 1 if action == 0 else 0
-        opposite_reward = -reward
-        self.memory.append((state, opposite_action, opposite_reward, new_state))
+        # opposite_action = 1 if action == 0 else 0
+        # opposite_reward = -reward
+        # self.memory.append((state, opposite_action, opposite_reward, new_state))
         self.replay()

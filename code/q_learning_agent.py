@@ -1,7 +1,7 @@
 import numpy as np
 
 class QLearningAgent:
-    def __init__(self, alpha=0.1, epsilon=0.02, gamma=0.9):
+    def __init__(self, alpha=0.1, epsilon=0.002, gamma=0.9):
         self.num_states = 203 + 1
         self.num_actions = 2
         self.actions = list(range(self.num_actions))

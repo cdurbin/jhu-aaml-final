@@ -76,7 +76,7 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
                     print(f'Starting episode {i + 1}')
 
                 plots.generate_and_save_plots(
-                    timestamp, output_dir, AGENT_LABELS[agent_type],
+                    timestamp, output_dir, AGENT_LABELS[bet_agent_type],
                     agents_win_rates,
                     agents_cumulative_rewards,
                     agents_balance,
@@ -180,7 +180,7 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
     print(f'Mean cumulative rewards: {avg_cumulative_rewards[-1]:.1f}')
 
     plots.generate_and_save_plots(
-        timestamp, output_dir, AGENT_LABELS[agent_type],
+        timestamp, output_dir, AGENT_LABELS[bet_agent_type],
         agents_win_rates,
         agents_cumulative_rewards,
         agents_balance,
