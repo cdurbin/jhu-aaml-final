@@ -26,52 +26,16 @@ def save_agent_balance_plot(agents_balance, output_file, agent_label):
     plt.savefig(output_file)
     plt.close()
 
-def save_bet_sizes_plot_alt(agents_bet_sizes, output_file, agent_label):
-    data = agents_bet_sizes[0]
-    range_size = 10000
-    num_ranges = (len(data) + range_size - 1) // range_size
-    count_500 = np.zeros(num_ranges)
-    count_10 = np.zeros(num_ranges)
-
-    for i in range(num_ranges):
-        start_idx = i * range_size
-        end_idx = start_idx + range_size
-        count_500[i] = np.sum(np.array(data[start_idx:end_idx]) == 500)
-        count_10[i] = np.sum(np.array(data[start_idx:end_idx]) == 10)
-
-    ranges = [f'{i*range_size+1}-{min((i+1)*range_size, len(data))}' for i in range(num_ranges)]
-    x = np.arange(len(ranges))
-    width = 0.35
-
-    fig, ax = plt.subplots()
-    rects1 = ax.bar(x - width/2, count_500, width, label='500')
-    rects2 = ax.bar(x + width/2, count_10, width, label='10')
-
-    ax.set_xlabel('Episode Ranges')
-    ax.set_ylabel('Counts')
-    ax.set_title('Counts by choice and episode range')
-    ax.set_xticks(x)
-    ax.set_xticklabels(ranges)
-    ax.legend()
-
-    fig.tight_layout()
-    plt.savefig(output_file)
-    plt.close()
-
 def save_bet_sizes_plot(agents_bet_sizes, output_file, agent_label):
     for i, bet_sizes in enumerate(agents_bet_sizes):
         choices = np.array(bet_sizes)
         cumulative_counts_500 = np.cumsum(choices == 500)
         cumulative_percentage_500 = (cumulative_counts_500 / np.arange(1, len(bet_sizes) + 1)) * 100
-        # episodes = np.arange(1, len(data) + 1)
-        # plt.figure(figsize=(10, 5))
-        # plt.plot(episodes, cumulative_percentage_500, label=f'Agent {i+1}')
         plt.plot(cumulative_percentage_500, label=f'Agent {i+1}')
 
     plt.title(f'{agent_label} agents cumulative percentage of choosing max bet size over time')
     plt.xlabel('Episode')
     plt.ylabel('Cumulative Percentage')
-    # plt.ylim(0, 100)
     plt.legend(loc='upper right')
     plt.grid(True)
     plt.savefig(output_file)

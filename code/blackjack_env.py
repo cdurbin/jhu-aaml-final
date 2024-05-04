@@ -26,24 +26,15 @@ class CardDeck:
         self.deal_seq = []
         self.number_of_decks = number_of_decks
         self.total_cards = 52 * self.number_of_decks
-        # self.initial_deck_state = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}
         self.initial_deck_state = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 'deck_percent': 0.0}
         self.state = copy.deepcopy(self.initial_deck_state)
 
     def maybe_shuffle_cards(self):
-        # Shuffle the cards if more than half have been dealt - no definitive source
-        # but read that usually the decks are shuffled anytime between 40-60% of the
-        # cards being dealt.
         total_cards = 52 * self.number_of_decks
-        # if len(self.deal_seq) < 0.5 * total_cards:
         if len(self.deal_seq) < 0.1 * total_cards:
             # print('SHUFFLING...')
             combined_decks = self.cards * self.number_of_decks
-            # print('Before')
-            # print(combined_decks[50:54])
-            # print('After')
             random.shuffle(combined_decks)
-            # print(combined_decks[50:54])
             self.deal_seq = combined_decks
             self.state = copy.deepcopy(self.initial_deck_state)
 
@@ -90,7 +81,6 @@ class Blackjack:
         if self.agent_total > 21 and self.usable_ace == True:
             self.usable_ace = False
             self.agent_total -= 10
-        # print("Agent drew a", new_card, "and now has", self.agent_total, "points.")
         if self.agent_total > 21:
             new_state = 201
         else:
@@ -120,8 +110,6 @@ class Blackjack:
         if dealer_face_up_card['value'] == 1 or dealer_face_down_card['value'] == 1:
             self.dealer_ace = True
             self.dealer_total += 10
-        # print("Dealer has", self.dealer_card, "and", dealer_face_down_card)
-        # print("Dealer has", self.dealer_total, "points.")
 
         # deal two cards to the agent
         card_1 = self.deck.deal_card()
@@ -130,8 +118,6 @@ class Blackjack:
         if card_1['value'] == 1 or card_2['value'] == 1:
             self.usable_ace = True
             self.agent_total += 10
-        # print("Agent has", card_1, "and", card_2)
-        # print("Agent has", self.agent_total, "points.")
 
         # check to see if the agent has a natural (ace + face card)
         if self.agent_total == 21:
@@ -148,16 +134,12 @@ class Blackjack:
                 if new_card['value'] == 1 and self.usable_ace == False and self.agent_total < 12:
                     self.usable_ace = True
                     self.agent_total += 10
-                # print("Agent drew a", new_card, "and now has", self.agent_total, "points.")
-            # now determine the initial state
             self.current_state = self.construct_state()
 
-        # reset complete; return the initial state
         return self.current_state
 
-    # Use the agent's action to determine the next state and reward
     def execute_action(self, action):
-        # action is 'stick'
+        # action is 'stay'
         if action == 0:
             # dealer's turn
             while self.dealer_total < 17:
@@ -195,7 +177,6 @@ class Blackjack:
         # action is 'hit'
         elif action == 1:
             new_state = self.get_next_state()
-            # if new_state == None:
             if new_state == 201:
                 reward = -1
                 game_end = True
@@ -203,7 +184,6 @@ class Blackjack:
                 reward = 0
                 game_end = False
 
-        # print("new_state =", new_state, "reward = ", reward, "game_end =", game_end)
         self.current_state = new_state
         return new_state, reward, game_end
 

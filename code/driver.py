@@ -72,7 +72,7 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
         current_bet = 0
         bet_counts = {0: 0, 1: 0}
         for i in range(num_episodes):
-            if (i % 10000 == 0):
+            if (i % 5000 == 0):
                 if bet_agent:
                     print(f'Starting episode {i + 1} Bet counts: {bet_counts}, balance change: {agent_balance - last_balance}')
                     last_balance = agent_balance
@@ -87,7 +87,6 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
                     agents_bet_sizes
                 )
 
-            # reset the game and observe the current state
             deck_state = environment.reset()
 
             if bet_agent:
@@ -124,24 +123,12 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
                         ties += 1
                     else:
                         agent_balance -= BET_SIZE[current_bet]
-                    # Update the bet size agent model
-                    # if bet_reward == 1.5 and reward > 0:
-                    #     # Agent had a natural blackjack which pays out an extra 0.5
-                    #     agent_balance += 0.5 * BET_SIZE[current_bet]
-                    # else:
                     bet_reward = reward
                     if current_bet == 0: # Small size bet - expected to lose
                         bet_reward = -1 * bet_reward # Reward a loss and punish a win
 
-            # opposite_bet = 0
-            # if current_bet == 0:
-            #     opposite_bet = 1
-
-            # episode_returns.append(episode_return)
-            # self.all_sum_rewards_last_30[agent_index, i] = np.mean(episode_returns[-30:])
             if bet_agent:
                 bet_agent.learn(deck_state, current_bet, deck_state, bet_reward, True)
-            # bet_agent.learn(deck_state, opposite_bet, deck_state, -bet_reward, True)
 
             agents_win_rates[a].append(wins / (i + 1.0))
             agents_win_rates_excluding_ties[a].append(wins / max([1, (i + 1.0 - ties)]))
@@ -155,32 +142,6 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
         print(f"Agent {a} Wins: {wins}, losses: {(num_episodes - ties - wins)}, ties: {ties}")
         if bet_agent:
             print(f'Agent {a} Final balance: {agent_balance}')
-
-        # # Exploit only
-        # if scenario == 2:
-        #     wins = 0
-        #     ties = 0
-        #     agent.epsilon = 0.0
-        #     for i in range(num_episodes):
-        #         current_state = environment.reset()
-        #         game_end = False
-        #         while not game_end:
-        #             action = agent.select_action(current_state)
-        #             new_state, reward, game_end = environment.execute_action(action)
-        #             agent.learn(new_state, reward, game_end)
-        #             current_state = new_state
-        #             if game_end:
-        #                 if reward > 0:
-        #                     wins += 1
-        #                 elif reward == 0:
-        #                     ties += 1
-        #                 agents_win_rates[a].append(wins / (i + 1.0))
-        #                 agents_win_rates_excluding_ties[a].append(wins / max([1, (i + 1.0 - ties)]))
-        #                 agents_cumulative_rewards[a].append(cumulative_rewards)
-        #     print(f"Agent {a} win rate while exploiting and excluding ties: {wins / (num_episodes - ties):.2f}")
-        #     print(f"Agent {a} wins: {wins}, losses: {(num_episodes - ties - wins)}, ties: {ties}\n")
-        #     if bet_agent:
-        #         print(f'Agent {a} Final balance: {agents_balance}')
 
     avg_win_rate = np.mean(agents_win_rates, axis=0)
     avg_win_rate_no_ties = np.mean(agents_win_rates_excluding_ties, axis=0)

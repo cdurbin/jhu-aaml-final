@@ -11,7 +11,7 @@ def check_for_duplicates(trajectory, state, action):
 
 class RlAgent:
     def __init__(self):
-        self.num_states = 203 # Note that only 202 are actually reachable
+        self.num_states = 203
         self.num_actions = 2
         self.actions = list(range(self.num_actions))
         self.state = None
@@ -22,7 +22,6 @@ class RlAgent:
         self.q = {}
         self.sa_visits = {}
 
-    # Public API
     def get_number_of_states(self):
         return self.num_states
 
@@ -61,7 +60,6 @@ class RlAgent:
         else:
             self.state = new_state
 
-    # Private API
     def e_greedy(self, q_values):
         """Implements epsilon greedy algorithm."""
         rng = np.random.default_rng()
@@ -81,13 +79,11 @@ class RlAgent:
         for i in range(len(trajectory) - 1):
             reward = trajectory[i]['r']
             G = self.discount_factor * G + reward
-            # print(f'G is {G}')
             state = trajectory[i + 1]['s']
             action = trajectory[i + 1]['a']
             has_duplicate = False
             if i < len(trajectory) - 2:
                 has_duplicate = check_for_duplicates(trajectory[i+2:], state, action)
-            # print(f'Has duplicate is {has_duplicate}')
             if not has_duplicate:
                 key = self.get_state_action_pair_key(state, action)
                 q = self.q.get(key, 0)

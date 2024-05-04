@@ -10,7 +10,6 @@ class QLearningAgent:
         self.gamma = gamma
         self.q = {}
 
-    # Public API
     def get_number_of_states(self):
         return self.num_states
 
@@ -51,7 +50,6 @@ class QLearningAgent:
         self.q[key] = new_q_value
 
 
-    # Private API
     def e_greedy(self, q_values):
         """Implements epsilon greedy algorithm."""
         rng = np.random.default_rng()
