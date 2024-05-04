@@ -31,7 +31,7 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
     else:
         print(f'Running with {num_agents} {AGENT_LABELS[agent_type]} hand playing agents for {num_episodes} episodes')
     timestamp = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    output_dir = '../output'
+    output_dir = 'output'
     os.makedirs(output_dir, exist_ok=True)
 
     agents_win_rates = []
