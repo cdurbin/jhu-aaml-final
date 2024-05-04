@@ -135,10 +135,6 @@ class Blackjack:
 
         # check to see if the agent has a natural (ace + face card)
         if self.agent_total == 21:
-            # TBD - figure out what to do here since it will be important for bet size
-            # But for now just shuffle again
-            # self.reset()
-
             if self.dealer_total == 21:
                 self.current_state = 202    # tie game
             else:

@@ -21,11 +21,15 @@ AGENT_LABELS = {
     'monte-carlo': 'Monte Carlo',
     'q-learning': 'Q-Learning',
     'random': 'Random',
-    'fixed': 'Fixed'
+    'fixed': 'Fixed',
+    'none': 'N/A'
 }
 
 def main(agent_type, num_episodes, num_agents, bet_agent_type):
-    print(f'Running with {num_agents} {agent_type} agents and {num_episodes} episodes')
+    if bet_agent_type != 'none':
+        print(f'Running with {num_agents} {AGENT_LABELS[agent_type]} hand playing agents using {AGENT_LABELS[bet_agent_type]} agents for bet sizes for {num_episodes} episodes')
+    else:
+        print(f'Running with {num_agents} {AGENT_LABELS[agent_type]} hand playing agents for {num_episodes} episodes')
     timestamp = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     output_dir = '../output'
     os.makedirs(output_dir, exist_ok=True)
@@ -68,7 +72,7 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
         current_bet = 0
         bet_counts = {0: 0, 1: 0}
         for i in range(num_episodes):
-            if (i % 5000 == 0):
+            if (i % 10000 == 0):
                 if bet_agent:
                     print(f'Starting episode {i + 1} Bet counts: {bet_counts}, balance change: {agent_balance - last_balance}')
                     last_balance = agent_balance
@@ -96,10 +100,14 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
             game_end = False
             if current_state == 303:
                 bet_reward = 1.5
+                wins += 1
+                agent_balance += 1.5 * BET_SIZE[current_bet]
                 if current_bet == 0:
                     bet_reward = -1.5
+                game_end = True
             elif current_state == 202:
                 bet_reward = 0
+                game_end = True
 
             while not game_end:
                 action = agent.select_action(current_state)
@@ -117,10 +125,11 @@ def main(agent_type, num_episodes, num_agents, bet_agent_type):
                     else:
                         agent_balance -= BET_SIZE[current_bet]
                     # Update the bet size agent model
-                    if abs(bet_reward) != 1.5:
-                        bet_reward = reward
-                    else: # Agent had a natural blackjack which pays out an extra 0.5
-                        agent_balance += 0.5 * BET_SIZE[current_bet]
+                    # if bet_reward == 1.5 and reward > 0:
+                    #     # Agent had a natural blackjack which pays out an extra 0.5
+                    #     agent_balance += 0.5 * BET_SIZE[current_bet]
+                    # else:
+                    bet_reward = reward
                     if current_bet == 0: # Small size bet - expected to lose
                         bet_reward = -1 * bet_reward # Reward a loss and punish a win
 

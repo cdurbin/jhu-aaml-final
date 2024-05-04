@@ -22,8 +22,8 @@ class BetSizeDQNAgent:
         self.epsilon=1.0
         self.epsilon_min=0.0001
         # self.epsilon_decay=0.995
-        self.epsilon_decay=0.999995
-        # self.epsilon_decay=0.99995
+        # self.epsilon_decay=0.999995
+        self.epsilon_decay=0.99995
         self.learning_rate=0.001
         # self.learning_rate=0.001
         self.memory = deque(maxlen=self.replay_buffer_size)
