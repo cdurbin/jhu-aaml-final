@@ -179,7 +179,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--agent-type',
                         choices=['random', 'q-learning','dqn', 'monte-carlo'],
                         default='dqn',
-                        help='Type of RL agent (random, q-learning, dqn, or monte-carlo).')
+                        help='Type of RL agent to use for playing hands (random, q-learning, dqn, or monte-carlo).')
 
     parser.add_argument('-e', '--num-episodes',
                         type=positive_int,
@@ -189,12 +189,12 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--num-agents',
                         type=positive_int,
                         default=1,
-                        help='Number of agents (positive integer).')
+                        help='Number of agent runs to perform (positive integer).')
 
     parser.add_argument('-b', '--bet-agent-type',
                         choices=['none', 'random', 'fixed', 'dqn'],
                         default='none',
-                        help='The agent to use for choosing bet size - none means do not track bet sizes.')
+                        help='Type of agent to use for choosing bet size - none means do not track bet sizes.')
 
     args = parser.parse_args()
     main(args.agent_type, args.num_episodes, args.num_agents, args.bet_agent_type)
