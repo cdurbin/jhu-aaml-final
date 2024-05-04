@@ -28,7 +28,7 @@ class FixedAgent:
         self.fixed_action = fixed_action
 
     def select_action(self, state):
-        """Always choose a random action."""
+        """Always choose the same action."""
         return self.fixed_action
 
     def learn(self, state, action, new_state, reward, game_end):
